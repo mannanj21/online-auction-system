@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env.config.js";
 import { registerAuctionHandlers } from "./auction.handler.js";
 import User from "../models/user.model.js";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
 
 let io;
 
@@ -16,6 +18,18 @@ export const initSocket = (server) => {
     pingTimeout: 60000,
     pingInterval: 25000,
   });
+
+  if (env.redis_url) {
+    const pubClient = createClient({ url: env.redis_url });
+    const subClient = pubClient.duplicate();
+
+    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+      io.adapter(createAdapter(pubClient, subClient));
+      console.log("Redis adapter connected to Socket.io");
+    }).catch(err => {
+      console.error("Redis adapter connection failed:", err.message);
+    });
+  }
 
   // Authenticate socket connections using JWT from cookies
   io.use(async (socket, next) => {

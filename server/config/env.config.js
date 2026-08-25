@@ -14,6 +14,9 @@ export const env = {
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
   cloudinary_url: process.env.CLOUDINARY_URL,
   resend_api_key: process.env.RESEND_API_KEY,
+  bid_increment_min: parseInt(process.env.BID_INCREMENT_MIN) || 1,
+  bid_increment_max: parseInt(process.env.BID_INCREMENT_MAX) || 10,
+  redis_url: process.env.REDIS_URL,
 };
 
 // Validate critical environment variables at startup

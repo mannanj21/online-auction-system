@@ -2,6 +2,7 @@ import Product from "../models/product.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../socket/index.js";
 import Upload from "../models/upload.model.js";
+import { placeBid as placeBidService, BidError } from "../services/bid.service.js";
 
 export const createAuction = async (req, res) => {
   try {
@@ -177,88 +178,31 @@ export const auctionById = async (req, res) => {
 
 export const placeBid = async (req, res) => {
   try {
-    const bidAmount = Number(req.body.bidAmount);
-    const user = req.user.id;
-    const { id } = req.params;
+    const { auction, bidderName } = await placeBidService({
+      auctionId: req.params.id,
+      userId: req.user.id,
+      bidAmount: req.body.bidAmount,
+    });
 
-    if (isNaN(bidAmount)) {
-      return res.status(400).json({ message: "Invalid bid amount" });
-    }
-
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ message: "Auction not found" });
-
-    // Prevent seller from bidding on their own auction
-    if (product.seller.toString() === user) {
-      return res
-        .status(403)
-        .json({ message: "You cannot bid on your own auction" });
-    }
-
-    if (new Date(product.itemEndDate) < new Date())
-      return res.status(400).json({ message: "Auction has already ended" });
-
-    const minBid = Math.max(product.currentPrice, product.startingPrice) + 1;
-    const maxBid = Math.max(product.currentPrice, product.startingPrice) + 10;
-    if (bidAmount < minBid)
-      return res
-        .status(400)
-        .json({ message: `Bid must be at least Rs ${minBid}` });
-    if (bidAmount > maxBid)
-      return res
-        .status(400)
-        .json({ message: `Bid must be at max Rs ${maxBid}` });
-
-    const updated = await Product.findOneAndUpdate(
-      {
-        _id: id,
-        currentPrice: product.currentPrice,
-        itemEndDate: { $gt: new Date() },
-      },
-      {
-        $set: { currentPrice: bidAmount },
-        $push: { bids: { bidder: user, bidAmount } },
-      },
-      { new: true },
-    );
-
-    if (!updated) {
-      return res
-        .status(409)
-        .json({ message: "Bid failed — price changed. Please try again." });
-    }
-
-    // Populate for the response and socket broadcast
-    const populated = await Product.findById(id)
-      .populate("seller", "name")
-      .populate("bids.bidder", "name");
-
-    populated.bids.sort((a, b) => new Date(b.bidTime) - new Date(a.bidTime));
-
-    // Broadcast to all socket users in this auction room
+    // Broadcast to socket room (presentation concern stays in controller)
     try {
       const io = getIO();
-      const bidderName =
-        populated.bids.find((b) => b.bidder?._id?.toString() === user)?.bidder
-          ?.name || "Someone";
-
-      io.to(id).emit("auction:bidPlaced", {
-        auction: populated,
+      io.to(req.params.id).emit("auction:bidPlaced", {
+        auction,
         bidderName,
-        bidderId: user,
-        bidAmount,
+        bidderId: req.user.id,
+        bidAmount: Number(req.body.bidAmount),
       });
     } catch (socketErr) {
       console.error("Socket broadcast error:", socketErr.message);
     }
 
-    res
-      .status(200)
-      .json({ message: "Bid placed successfully", auction: populated });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error placing bid", error: error.message });
+    res.status(200).json({ message: "Bid placed successfully", auction });
+  } catch (err) {
+    if (err instanceof BidError) {
+      return res.status(err.statusCode).json({ message: err.message });
+    }
+    res.status(500).json({ message: "Error placing bid", error: err.message });
   }
 };
 

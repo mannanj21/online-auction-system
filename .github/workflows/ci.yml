@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20.x"
+        cache: 'npm'
+        cache-dependency-path: './server/package-lock.json'
+        
+    - name: Install dependencies (Server)
+      working-directory: ./server
+      run: npm ci || npm install
+      
+    - name: Run Tests (Server)
+      working-directory: ./server
+      run: npm test
+      
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20.x"
+        cache: 'npm'
+        cache-dependency-path: './client/package-lock.json'
+        
+    - name: Install dependencies (Client)
+      working-directory: ./client
+      run: npm ci || npm install
+      
+    - name: Build (Client)
+      working-directory: ./client
+      run: npm run build
