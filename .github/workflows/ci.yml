@@ -40,7 +40,7 @@ jobs:
 
     - name: Run Tests (Server)
       working-directory: ./server
-      run: npm test
+      run: npm test -- --runInBand
       env:
         MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.mongodb-binaries
 
