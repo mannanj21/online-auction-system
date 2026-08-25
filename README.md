@@ -20,43 +20,6 @@
 
 ---
 
-## Screenshots
-
-> Click any image to view full size
-
-<table>
-<tr>
-<td width="33%" align="center">
-<b>Landing Page</b><br><br>
-<a href="screenshots/landingpage.png"><img src="screenshots/landingpage.png" alt="Landing Page" /></a>
-</td>
-<td width="33%" align="center">
-<b>User Dashboard</b><br><br>
-<a href="screenshots/dashboard.png"><img src="screenshots/dashboard.png" alt="Dashboard" /></a>
-</td>
-<td width="33%" align="center">
-<b>Auction Page</b><br><br>
-<a href="screenshots/auctionpage.png"><img src="screenshots/auctionpage.png" alt="Auction Page" /></a>
-</td>
-</tr>
-<tr>
-<td width="33%" align="center">
-<b>Auction Winner</b><br><br>
-<a href="screenshots/auctionwinner.png"><img src="screenshots/auctionwinner.png" alt="Auction Winner" /></a>
-</td>
-<td width="33%" align="center">
-<b>My Bids</b><br><br>
-<a href="screenshots/mybids.png"><img src="screenshots/mybids.png" alt="My Bids" /></a>
-</td>
-<td width="33%" align="center">
-<b>Admin Dashboard</b><br><br>
-<a href="screenshots/admindashboard.png"><img src="screenshots/admindashboard.png" alt="Admin Dashboard" /></a>
-</td>
-</tr>
-</table>
-
----
-
 ## Why This Project?
 
 Most auction system tutorials stop at basic CRUD. This project goes much further:

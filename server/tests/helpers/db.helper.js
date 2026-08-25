@@ -10,7 +10,9 @@ export const connect = async () => {
 
 export const disconnect = async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
 };
 
 export const clearDatabase = async () => {
