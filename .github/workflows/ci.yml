@@ -23,7 +23,7 @@ jobs:
     - name: Cache mongodb-memory-server binary
       uses: actions/cache@v4
       with:
-        path: ~/.cache/mongodb-binaries
+        path: ${{ github.workspace }}/.mongodb-binaries
         key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('server/package-lock.json') }}
         restore-keys: |
           mongodb-binaries-${{ runner.os }}-
@@ -36,13 +36,13 @@ jobs:
       working-directory: ./server
       run: node -e "import('mongodb-memory-server').then(async m => { const s = await m.MongoMemoryServer.create(); await s.stop(); console.log('Binary ready'); })"
       env:
-        MONGOMS_DOWNLOAD_DIR: ~/.cache/mongodb-binaries
+        MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.mongodb-binaries
 
     - name: Run Tests (Server)
       working-directory: ./server
       run: npm test
       env:
-        MONGOMS_DOWNLOAD_DIR: ~/.cache/mongodb-binaries
+        MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.mongodb-binaries
 
   build:
     runs-on: ubuntu-latest
