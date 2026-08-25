@@ -71,8 +71,7 @@ npm install
 Create a `.env` file:
 
 ```env
-VITE_API=http://localhost:3000
-VITE_AUCTION_API=http://localhost:3000/auction
+VITE_API=http://localhost:3000/api
 ```
 
 Then start the dev server:
@@ -169,8 +168,7 @@ src/
 
 | Variable           | Required | Description          | Example                         |
 | ------------------ | -------- | -------------------- | ------------------------------- |
-| `VITE_API`         | **Yes**  | Backend API base URL | `http://localhost:3000`         |
-| `VITE_AUCTION_API` | **Yes**  | Auction API base URL | `http://localhost:3000/auction` |
+| `VITE_API` | **Yes** | Backend API base URL | `http://localhost:3000/api` |
 
 ---
 

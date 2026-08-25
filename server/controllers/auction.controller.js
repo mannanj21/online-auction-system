@@ -1,4 +1,3 @@
-import getImageUrl from "../services/cloudinaryService.js";
 import Product from "../models/product.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../socket/index.js";
@@ -20,15 +19,25 @@ export const createAuction = async (req, res) => {
 
     const start = itemStartDate ? new Date(itemStartDate) : new Date();
     const end = new Date(itemEndDate);
-    if (end <= start) {
+    const price = Number(startingPrice);
+    if (
+      !itemName?.trim() ||
+      !itemDescription?.trim() ||
+      !itemCategory?.trim() ||
+      !Number.isFinite(price) ||
+      price < 1 ||
+      Number.isNaN(start.getTime()) ||
+      Number.isNaN(end.getTime()) ||
+      end <= start
+    ) {
       return res
         .status(400)
-        .json({ message: "Auction end date must be after start date" });
+        .json({ message: "Please provide valid auction details and dates" });
     }
 
     const upload = await Upload.findOne({ formId });
 
-    if (!upload) {
+    if (!upload || upload.status !== "pending") {
       return res.status(400).json({
         message: "Invalid upload session",
       });
@@ -42,8 +51,8 @@ export const createAuction = async (req, res) => {
 
     const newAuction = new Product({
       itemName,
-      startingPrice,
-      currentPrice: startingPrice,
+      startingPrice: price,
+      currentPrice: price,
       itemDescription,
       itemCategory,
       itemImage: {
@@ -56,6 +65,8 @@ export const createAuction = async (req, res) => {
     });
     await newAuction.save();
 
+    upload.public_id = public_id;
+    upload.secure_url = secure_url;
     upload.status = "used";
     await upload.save();
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router";
 import LoadingScreen from "../../components/LoadingScreen";
-import { getAllUsers } from "../../api/admin";
+import { getAllUsers } from "../../services/admin.service";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 export const UsersList = () => {

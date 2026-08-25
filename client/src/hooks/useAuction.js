@@ -47,11 +47,11 @@ export const usePlaceBid = () => {
   return useMutation({
     mutationFn: ({ bidAmount, id }) => placeBid({ bidAmount, id }),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries(["auction", variables.id]);
-      queryClient.invalidateQueries(["auctions"]);
-      queryClient.invalidateQueries(["myAuctions"]);
-      queryClient.invalidateQueries(["myBids"]);
-      queryClient.invalidateQueries(["dashboardStats"]);
+      queryClient.invalidateQueries({ queryKey: ["auction", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["myAuctions"] });
+      queryClient.invalidateQueries({ queryKey: ["myBids"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
     },
   });
 };
@@ -62,9 +62,9 @@ export const useCreateAuction = (options = {}) => {
   return useMutation({
     mutationFn: (data) => createAuction(data),
     onSuccess: (...args) => {
-      queryClient.invalidateQueries(["auctions"]);
-      queryClient.invalidateQueries(["myAuctions"]);
-      queryClient.invalidateQueries(["dashboardStats"]);
+      queryClient.invalidateQueries({ queryKey: ["auctions"] });
+      queryClient.invalidateQueries({ queryKey: ["myAuctions"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
       options.onSuccess?.(...args);
     },
     onError: options.onError,
